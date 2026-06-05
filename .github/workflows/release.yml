@@ -22,6 +22,14 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Check release secrets
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.PASSPHRASE }}
+        run: |
+          test -n "$GPG_PRIVATE_KEY" || (echo "Missing GPG_PRIVATE_KEY repository secret" && exit 1)
+          test -n "$GPG_PASSPHRASE" || (echo "Missing PASSPHRASE repository secret" && exit 1)
+
       - name: Import GPG key
         id: import_gpg
         uses: crazy-max/ghaction-import-gpg@v6
@@ -38,4 +46,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
-          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+          GPG_PASSPHRASE: ${{ secrets.PASSPHRASE }}
